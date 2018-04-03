@@ -10,4 +10,5 @@
     <string name="up">Up</string>
     <string name="title_activity_main">MainActivity</string>
 
+    <string name="content_image_backdrop_main">XYZ reader main backdrop</string>
 </resources>
