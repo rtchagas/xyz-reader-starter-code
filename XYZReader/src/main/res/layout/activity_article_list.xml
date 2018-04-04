@@ -26,7 +26,7 @@
                 app:layout_collapseParallaxMultiplier="0.7">
 
                 <ImageView
-                    android:id="@+id/image_step_backdrop"
+                    android:id="@+id/image_backdrop"
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/backdrop_height"
                     android:contentDescription="@string/content_image_backdrop_main"
