@@ -15,12 +15,12 @@ import android.support.v4.view.ViewPager;
 import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.graphics.Palette;
+import android.support.v7.widget.Toolbar;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.format.DateUtils;
 import android.text.method.LinkMovementMethod;
 import android.text.style.ForegroundColorSpan;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -67,6 +67,13 @@ public class ArticleDetailActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_article_detail);
+
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        toolbar.setTitle("");
+        setSupportActionBar(toolbar);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        }
 
         // Initializes the page adapter.
         mPagerAdapter = new MyPagerAdapter(getSupportFragmentManager());
@@ -186,14 +193,8 @@ public class ArticleDetailActivity extends AppCompatActivity
             // Adjust the line breaks.
             body = body.replaceAll("(\\S.*?)\\R(.*?\\S)", "$1 $2");
 
-            // Get some information about where to draw the text.
-            View root = LayoutInflater.from(this).inflate(R.layout.fragment_article_detail, null);
-            TextView tvBody = root.findViewById(R.id.tv_page_content);
-
             // Split the article body into pages.
-            PageSplitter splitter = new PageSplitter(scrollView.getMeasuredWidth(), scrollView.getHeight(),
-                    tvBody.getLineSpacingMultiplier(), 0);
-            splitter.append(body, tvBody.getPaint());
+            PageSplitter splitter = new PageSplitter(this, body);
 
             // Set the page adapter.
             mPagerAdapter.setPages(splitter.getPages());
@@ -210,7 +211,7 @@ public class ArticleDetailActivity extends AppCompatActivity
 
     private class MyPagerAdapter extends FragmentStatePagerAdapter {
 
-        private List<CharSequence> pageList = null;
+        private List<String> pageList = null;
 
         MyPagerAdapter(FragmentManager fm) {
             super(fm);
@@ -218,7 +219,7 @@ public class ArticleDetailActivity extends AppCompatActivity
 
         @Override
         public Fragment getItem(int position) {
-            return ArticleDetailFragment.newInstance(pageList.get(position), position, getCount());
+            return ArticleDetailFragment.newInstance(pageList.get(position), (position + 1), getCount());
         }
 
         @Override
@@ -226,7 +227,7 @@ public class ArticleDetailActivity extends AppCompatActivity
             return (pageList != null ? pageList.size() : 0);
         }
 
-        void setPages(List<CharSequence> pages) {
+        void setPages(List<String> pages) {
             this.pageList = pages;
             notifyDataSetChanged();
         }

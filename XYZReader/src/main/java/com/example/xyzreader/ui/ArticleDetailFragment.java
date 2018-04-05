@@ -25,7 +25,7 @@ public class ArticleDetailFragment extends Fragment {
     private static final String ARG_PAGE_CURRENT = "arg_page_current";
     private static final String ARG_PAGE_COUNT = "arg_page_count";
 
-    private CharSequence mPageContent = null;
+    private String mPageContent = null;
     private int mPage = 0;
     private int mCount = 0;
 
@@ -36,9 +36,9 @@ public class ArticleDetailFragment extends Fragment {
     public ArticleDetailFragment() {
     }
 
-    public static ArticleDetailFragment newInstance(CharSequence content, int page, int pageCount) {
+    public static ArticleDetailFragment newInstance(String content, int page, int pageCount) {
         Bundle arguments = new Bundle();
-        arguments.putCharSequence(ARG_PAGE_CONTENT, content);
+        arguments.putString(ARG_PAGE_CONTENT, content);
         arguments.putInt(ARG_PAGE_CURRENT, page);
         arguments.putInt(ARG_PAGE_COUNT, pageCount);
         ArticleDetailFragment fragment = new ArticleDetailFragment();
@@ -50,7 +50,7 @@ public class ArticleDetailFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            mPageContent = getArguments().getCharSequence(ARG_PAGE_CONTENT);
+            mPageContent = getArguments().getString(ARG_PAGE_CONTENT);
             mPage = getArguments().getInt(ARG_PAGE_CURRENT);
             mCount = getArguments().getInt(ARG_PAGE_COUNT);
         }
@@ -67,7 +67,10 @@ public class ArticleDetailFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_article_detail, container, false);
 
         TextView tvPageContent = rootView.findViewById(R.id.tv_page_content);
-        tvPageContent.setText(mPageContent, TextView.BufferType.SPANNABLE);
+
+        // Show the article body as HTML
+        String htmlText = mPageContent.replaceAll("(\r\n|\n)", "<br/>");
+        tvPageContent.setText(Html.fromHtml(htmlText));
 
         TextView tvPageCount = rootView.findViewById(R.id.tv_page_count);
         tvPageCount.setText(String.format("%s/%s", mPage, mCount));

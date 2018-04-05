@@ -11,12 +11,12 @@
         android:theme="@style/AppTheme.AppBarOverlay">
 
         <android.support.design.widget.CollapsingToolbarLayout
-            android:id="@+id/toolbar_layout_step"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:fitsSystemWindows="true"
             app:contentScrim="@android:color/transparent"
             app:layout_scrollFlags="scroll|enterAlways"
+            app:titleEnabled="false"
             app:toolbarId="@+id/toolbar">
 
             <FrameLayout

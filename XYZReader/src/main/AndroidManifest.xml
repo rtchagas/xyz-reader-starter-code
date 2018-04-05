@@ -16,7 +16,8 @@
         android:theme="@style/AppTheme">
         <activity
             android:name=".ui.ArticleListActivity"
-            android:label="@string/app_name">
+            android:label="@string/app_name"
+            android:launchMode="singleTop">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -33,10 +34,6 @@
 
                 <data android:mimeType="vnd.android.cursor.item/vnd.com.example.xyzreader.items" />
             </intent-filter>
-
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".ui.ArticleListActivity" />
         </activity>
 
         <service

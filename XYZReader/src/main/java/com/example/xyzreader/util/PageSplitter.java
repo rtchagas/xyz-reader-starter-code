@@ -1,112 +1,42 @@
 package com.example.xyzreader.util;
 
 
-import android.graphics.Typeface;
-import android.text.SpannableString;
-import android.text.SpannableStringBuilder;
-import android.text.TextPaint;
-import android.text.style.StyleSpan;
+import android.content.Context;
+import android.support.annotation.NonNull;
+
+import com.example.xyzreader.R;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public final class PageSplitter {
 
-    private final int pageWidth;
-    private final int pageHeight;
-    private final float lineSpacingMultiplier;
-    private final int lineSpacingExtra;
-    private final List<CharSequence> pages = new ArrayList<>();
-    private SpannableStringBuilder currentLine = new SpannableStringBuilder();
-    private SpannableStringBuilder currentPage = new SpannableStringBuilder();
-    private int currentLineHeight;
-    private int pageContentHeight;
-    private int currentLineWidth;
-    private int textLineHeight;
+    private int mMaxWords;
+    private String mText;
 
-    public PageSplitter(int pageWidth, int pageHeight, float lineSpacingMultiplier, int lineSpacingExtra) {
-        this.pageWidth = pageWidth;
-        this.pageHeight = pageHeight;
-        this.lineSpacingMultiplier = lineSpacingMultiplier;
-        this.lineSpacingExtra = lineSpacingExtra;
+    public PageSplitter(@NonNull Context context, @NonNull String text) {
+        mMaxWords = context.getResources().getInteger(R.integer.max_words_per_page);
+        mText = text;
     }
 
-    public void append(String text, TextPaint textPaint) {
-        textLineHeight = (int) Math.ceil(textPaint.getFontMetrics(null) * lineSpacingMultiplier + lineSpacingExtra);
-        String[] paragraphs = text.split("\n", -1);
-        int i;
-        for (i = 0; i < paragraphs.length - 1; i++) {
-            appendText(paragraphs[i], textPaint);
-            appendNewLine();
+    public List<String> getPages() {
+
+        ArrayList<String> pageList = new ArrayList<>();
+        String[] wordsArray = mText.split(" ");
+        int idx = 0;
+
+        while (idx < wordsArray.length) {
+
+            StringBuilder builder = new StringBuilder();
+
+            for (int i = 0; (i < mMaxWords) && (idx < wordsArray.length); i++) {
+                builder.append(wordsArray[idx++]);
+                builder.append(" ");
+            }
+
+            pageList.add(builder.toString());
         }
-        appendText(paragraphs[i], textPaint);
-    }
 
-    private void appendText(String text, TextPaint textPaint) {
-        String[] words = text.split(" ", -1);
-        int i;
-        for (i = 0; i < words.length - 1; i++) {
-            appendWord(words[i] + " ", textPaint);
-        }
-        appendWord(words[i], textPaint);
-    }
-
-    private void appendNewLine() {
-        currentLine.append("\n");
-        checkForPageEnd();
-        appendLineToPage(textLineHeight);
-    }
-
-    private void checkForPageEnd() {
-        if (pageContentHeight + currentLineHeight > pageHeight) {
-            pages.add(currentPage);
-            currentPage = new SpannableStringBuilder();
-            pageContentHeight = 0;
-        }
-    }
-
-    private void appendWord(String appendedText, TextPaint textPaint) {
-        int textWidth = (int) Math.ceil(textPaint.measureText(appendedText));
-        if (currentLineWidth + textWidth >= pageWidth) {
-            checkForPageEnd();
-            appendLineToPage(textLineHeight);
-        }
-        appendTextToLine(appendedText, textPaint, textWidth);
-    }
-
-    private void appendLineToPage(int textLineHeight) {
-        currentPage.append(currentLine);
-        pageContentHeight += currentLineHeight;
-
-        currentLine = new SpannableStringBuilder();
-        currentLineHeight = textLineHeight;
-        currentLineWidth = 0;
-    }
-
-    private void appendTextToLine(String appendedText, TextPaint textPaint, int textWidth) {
-        currentLineHeight = Math.max(currentLineHeight, textLineHeight);
-        currentLine.append(renderToSpannable(appendedText, textPaint));
-        currentLineWidth += textWidth;
-    }
-
-    public List<CharSequence> getPages() {
-        List<CharSequence> copyPages = new ArrayList<>(pages);
-        SpannableStringBuilder lastPage = new SpannableStringBuilder(currentPage);
-        if (pageContentHeight + currentLineHeight > pageHeight) {
-            copyPages.add(lastPage);
-            lastPage = new SpannableStringBuilder();
-        }
-        lastPage.append(currentLine);
-        copyPages.add(lastPage);
-        return copyPages;
-    }
-
-    private SpannableString renderToSpannable(String text, TextPaint textPaint) {
-        SpannableString spannable = new SpannableString(text);
-
-        if (textPaint.isFakeBoldText()) {
-            spannable.setSpan(new StyleSpan(Typeface.BOLD), 0, spannable.length(), 0);
-        }
-        return spannable;
+        return pageList;
     }
 }
