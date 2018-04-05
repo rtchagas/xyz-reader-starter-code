@@ -2,6 +2,7 @@ package com.example.xyzreader.ui;
 
 
 import android.app.LoaderManager;
+import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -11,8 +12,8 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.app.ShareCompat;
 import android.support.v4.view.ViewPager;
-import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.Toolbar;
@@ -50,9 +51,11 @@ public class ArticleDetailActivity extends AppCompatActivity
     private static final String STATE_ITEM_ID = "state_item_id";
 
     private long mSelectedItemId;
+    private String mSelectedTitle = null;
+    private int mSelectedPageIdx;
 
-    private ViewPager mPager;
-    private MyPagerAdapter mPagerAdapter;
+    private ViewPager mPager = null;
+    private MyPagerAdapter mPagerAdapter = null;
 
     private SimpleDateFormat dateFormat =
             new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.sss", Locale.US);
@@ -81,6 +84,13 @@ public class ArticleDetailActivity extends AppCompatActivity
         // Configure the pager
         mPager = findViewById(R.id.pager);
         mPager.setAdapter(mPagerAdapter);
+        mPager.addOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
+            @Override
+            public void onPageSelected(int position) {
+                super.onPageSelected(position);
+                mSelectedPageIdx = position;
+            }
+        });
 
         if (savedInstanceState == null) {
             if ((getIntent() != null) && (getIntent().getData() != null)) {
@@ -120,13 +130,13 @@ public class ArticleDetailActivity extends AppCompatActivity
         final View vScrim = findViewById(R.id.scrim);
         TextView titleView = findViewById(R.id.article_title);
         TextView bylineView = findViewById(R.id.article_byline);
-        NestedScrollView scrollView = findViewById(R.id.scrollView);
         bylineView.setMovementMethod(new LinkMovementMethod());
 
         if ((cursor != null) && cursor.moveToFirst()) {
 
             // Set the title
-            titleView.setText(cursor.getString(ArticleLoader.Query.TITLE));
+            mSelectedTitle = cursor.getString(ArticleLoader.Query.TITLE);
+            titleView.setText(mSelectedTitle);
 
             // Compose the byline content.
             String author = cursor.getString(ArticleLoader.Query.AUTHOR);
@@ -209,6 +219,19 @@ public class ArticleDetailActivity extends AppCompatActivity
         }
     }
 
+    public void shareArticle(View view) {
+
+        String textFormat = "%s\n\n%s\n\n%s";
+        String currentPage = mPagerAdapter.getSinglePage(mSelectedPageIdx);
+        String pageCount = getString(R.string.share_page_count, (mSelectedPageIdx + 1),
+                mPagerAdapter.getCount());
+
+        startActivity(Intent.createChooser(ShareCompat.IntentBuilder.from(this)
+                .setType("text/plain")
+                .setText(String.format(textFormat, mSelectedTitle, pageCount, currentPage))
+                .getIntent(), getString(R.string.action_share)));
+    }
+
     private class MyPagerAdapter extends FragmentStatePagerAdapter {
 
         private List<String> pageList = null;
@@ -230,6 +253,13 @@ public class ArticleDetailActivity extends AppCompatActivity
         void setPages(List<String> pages) {
             this.pageList = pages;
             notifyDataSetChanged();
+        }
+
+        String getSinglePage(int position) {
+            if ((pageList != null) && (position < pageList.size())) {
+                return pageList.get(position);
+            }
+            return null;
         }
     }
 }

@@ -1,9 +1,9 @@
 <resources>
 
     <string name="app_name">XYZ Reader</string>
-    <string name="welcome_xyz_reader">Welcome to XYZ Reader!</string>
 
-    <string name="action_share">Share</string>
+    <string name="action_share">Share this page with…</string>
+    <string name="share_page_count">Page %d of %d</string>
 
     <string name="by_author">" by %s"</string>
 
