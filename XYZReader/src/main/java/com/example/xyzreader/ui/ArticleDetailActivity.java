@@ -96,7 +96,8 @@ public class ArticleDetailActivity extends AppCompatActivity
             if ((getIntent() != null) && (getIntent().getData() != null)) {
                 mSelectedItemId = ItemsContract.Items.getItemId(getIntent().getData());
             }
-        } else {
+        }
+        else {
             mSelectedItemId = savedInstanceState.getLong(STATE_ITEM_ID);
         }
 
@@ -148,7 +149,8 @@ public class ArticleDetailActivity extends AppCompatActivity
                         publishedDate.getTime(),
                         System.currentTimeMillis(), DateUtils.HOUR_IN_MILLIS,
                         DateUtils.FORMAT_ABBREV_ALL).toString();
-            } else {
+            }
+            else {
                 // If date is before 1902, just show the string
                 date = outputFormat.format(publishedDate);
             }
@@ -214,7 +216,8 @@ public class ArticleDetailActivity extends AppCompatActivity
     private Date parsePublishedDate(String date) {
         try {
             return dateFormat.parse(date);
-        } catch (ParseException ex) {
+        }
+        catch (ParseException ex) {
             return new Date();
         }
     }
