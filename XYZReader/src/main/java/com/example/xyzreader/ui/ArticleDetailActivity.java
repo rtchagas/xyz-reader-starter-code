@@ -1,6 +1,7 @@
 package com.example.xyzreader.ui;
 
 
+import android.annotation.SuppressLint;
 import android.app.LoaderManager;
 import android.content.Intent;
 import android.content.Loader;
@@ -8,10 +9,13 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.app.NavUtils;
 import android.support.v4.app.ShareCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
@@ -22,7 +26,14 @@ import android.text.SpannableString;
 import android.text.format.DateUtils;
 import android.text.method.LinkMovementMethod;
 import android.text.style.ForegroundColorSpan;
+import android.transition.Slide;
+import android.transition.Transition;
+import android.transition.TransitionInflater;
+import android.transition.TransitionManager;
+import android.view.Gravity;
+import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -48,8 +59,6 @@ import java.util.Locale;
 public class ArticleDetailActivity extends AppCompatActivity
         implements LoaderManager.LoaderCallbacks<Cursor> {
 
-    private static final String STATE_ITEM_ID = "state_item_id";
-
     private long mSelectedItemId;
     private String mSelectedTitle = null;
     private int mSelectedPageIdx;
@@ -70,6 +79,7 @@ public class ArticleDetailActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_article_detail);
+        setupWindowTransitions();
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         toolbar.setTitle("");
@@ -92,22 +102,27 @@ public class ArticleDetailActivity extends AppCompatActivity
             }
         });
 
-        if (savedInstanceState == null) {
-            if ((getIntent() != null) && (getIntent().getData() != null)) {
-                mSelectedItemId = ItemsContract.Items.getItemId(getIntent().getData());
-            }
+        if ((getIntent() != null) && (getIntent().getData() != null)) {
+            mSelectedItemId = ItemsContract.Items.getItemId(getIntent().getData());
+            getLoaderManager().initLoader(0, null, ArticleDetailActivity.this);
         }
-        else {
-            mSelectedItemId = savedInstanceState.getLong(STATE_ITEM_ID);
-        }
-
-        getLoaderManager().initLoader(0, null, this);
     }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putLong(STATE_ITEM_ID, mSelectedItemId);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        // Back/home button just finishes this activity
+        if (android.R.id.home == item.getItemId()) {
+            NavUtils.navigateUpFromSameTask(this);
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -125,7 +140,36 @@ public class ArticleDetailActivity extends AppCompatActivity
         mPagerAdapter.notifyDataSetChanged();
     }
 
-    private void updateArticleInfo(Cursor cursor) {
+    private void setupWindowTransitions() {
+
+        getWindow().getSharedElementEnterTransition().addListener(new Transition.TransitionListener() {
+            @Override
+            public void onTransitionStart(Transition transition) { /* Empty */ }
+
+            @Override
+            public void onTransitionEnd(Transition transition) {
+                // Animate the meta information.
+                ViewGroup metaInfoGroup = findViewById(R.id.detail_meta_group);
+                metaInfoGroup.setVisibility(View.INVISIBLE);
+                Slide slide = (Slide) TransitionInflater.from(getBaseContext()).inflateTransition(R.transition.slide_slow_in);
+                slide.setSlideEdge(Gravity.START);
+                TransitionManager.beginDelayedTransition(metaInfoGroup, slide);
+                metaInfoGroup.setVisibility(View.VISIBLE);
+            }
+
+            @Override
+            public void onTransitionCancel(Transition transition) { /* Empty */ }
+
+            @Override
+            public void onTransitionPause(Transition transition) { /* Empty */ }
+
+            @Override
+            public void onTransitionResume(Transition transition) { /* Empty */ }
+        });
+    }
+
+    @SuppressLint("StaticFieldLeak")
+    private void updateArticleInfo(final Cursor cursor) {
 
         final ImageView ivBackdrop = findViewById(R.id.image_backdrop);
         final View vScrim = findViewById(R.id.scrim);
@@ -178,17 +222,21 @@ public class ArticleDetailActivity extends AppCompatActivity
                     ivBackdrop.setImageBitmap(bitmap);
 
                     // Extract the palette.
-                    Palette p = Palette.from(bitmap).generate();
-                    int color = p.getDarkMutedColor(getResources().getColor(R.color.colorPrimaryDark));
+                    Palette.from(bitmap).generate(new Palette.PaletteAsyncListener() {
+                        @Override
+                        public void onGenerated(@NonNull Palette palette) {
+                            int color = palette.getDarkMutedColor(getResources().getColor(R.color.colorPrimaryDark));
 
-                    // Create a gradient with that color
-                    GradientDrawable gd = new GradientDrawable(
-                            GradientDrawable.Orientation.TOP_BOTTOM,
-                            new int[]{0, color});
-                    gd.setCornerRadius(0f);
+                            // Create a gradient with that color
+                            GradientDrawable gd = new GradientDrawable(
+                                    GradientDrawable.Orientation.TOP_BOTTOM,
+                                    new int[]{0, color});
+                            gd.setCornerRadius(0f);
 
-                    // Set the gradient to the scrim.
-                    vScrim.setBackground(gd);
+                            // Set the gradient to the scrim.
+                            vScrim.setBackground(gd);
+                        }
+                    });
                 }
 
                 @Override
@@ -201,15 +249,31 @@ public class ArticleDetailActivity extends AppCompatActivity
             // Set the article body.
             // For this, we are going to break the content into pages
             // and serve them to the pager adapter.
-            String body = cursor.getString(ArticleLoader.Query.BODY);
-            // Adjust the line breaks.
-            body = body.replaceAll("(\\S.*?)\\R(.*?\\S)", "$1 $2");
+            // As this is a costly operation, let's do it in another thread.
+            new AsyncTask<Void, Void, List<String>>() {
 
-            // Split the article body into pages.
-            PageSplitter splitter = new PageSplitter(this, body);
+                @Override
+                protected List<String> doInBackground(Void... voids) {
+                    String body = cursor.getString(ArticleLoader.Query.BODY);
 
-            // Set the page adapter.
-            mPagerAdapter.setPages(splitter.getPages());
+                    // Adjust the line breaks.
+                    body = body.replaceAll("(\\S.*?)\\R(.*?\\S)", "$1 $2");
+
+                    // Split the article body into pages.
+                    PageSplitter splitter = new PageSplitter(getApplicationContext(), body);
+
+                    return splitter.getPages();
+                }
+
+                @Override
+                protected void onPostExecute(List<String> pages) {
+                    super.onPostExecute(pages);
+                    if (pages != null) {
+                        // Set the page adapter.
+                        mPagerAdapter.setPages(pages);
+                    }
+                }
+            }.execute();
         }
     }
 

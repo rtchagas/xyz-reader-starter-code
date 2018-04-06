@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="transition_article_backdrop">article_backdrop_transition</string>
+</resources>

@@ -31,43 +31,51 @@
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/detail_backdrop_height"
                     android:scaleType="centerCrop"
+                    android:transitionName="@string/transition_article_backdrop"
                     tools:ignore="ContentDescription" />
 
-                <View
-                    android:id="@+id/scrim"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:background="@drawable/scrim" />
-
-                <LinearLayout
-                    android:id="@+id/meta_bar"
+                <FrameLayout
+                    android:id="@+id/detail_meta_group"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="bottom"
-                    android:orientation="vertical"
-                    android:paddingBottom="20dp"
-                    android:paddingEnd="@dimen/detail_meta_side_padding"
-                    android:paddingStart="@dimen/detail_meta_side_padding">
+                    android:layout_gravity="bottom">
 
-                    <TextView
-                        android:id="@+id/article_title"
-                        style="?android:attr/textAppearanceLarge"
+                    <View
+                        android:id="@+id/scrim"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="@drawable/scrim" />
+
+                    <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginBottom="4dp"
-                        android:fontFamily="sans-serif-condensed"
-                        android:lineSpacingMultiplier="0.9"
-                        android:textColor="@color/material_white"
-                        android:textSize="@dimen/detail_title_text_size"
-                        android:textStyle="bold" />
+                        android:orientation="vertical"
+                        android:paddingBottom="20dp"
+                        android:paddingEnd="@dimen/detail_meta_side_padding"
+                        android:paddingStart="@dimen/detail_meta_side_padding">
 
-                    <TextView
-                        android:id="@+id/article_byline"
-                        style="?android:attr/textAppearanceSmall"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textColor="@color/secondaryTextColor" />
-                </LinearLayout>
+                        <TextView
+                            android:id="@+id/article_title"
+                            style="?android:attr/textAppearanceLarge"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="4dp"
+                            android:fontFamily="sans-serif-condensed"
+                            android:lineSpacingMultiplier="0.9"
+                            android:textColor="@color/material_white"
+                            android:textSize="@dimen/detail_title_text_size"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/article_byline"
+                            style="?android:attr/textAppearanceSmall"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/secondaryTextColor" />
+                    </LinearLayout>
+
+                </FrameLayout>
+
             </FrameLayout>
 
             <android.support.v7.widget.Toolbar
