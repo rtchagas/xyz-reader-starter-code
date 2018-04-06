@@ -15,7 +15,7 @@ public final class PageSplitter {
     private String mText;
 
     public PageSplitter(@NonNull Context context, @NonNull String text) {
-        mMaxWords = context.getResources().getInteger(R.integer.max_words_per_page);
+        mMaxWords = context.getResources().getInteger(R.integer.detail_max_words_per_page);
         mText = text;
     }
 

@@ -7,8 +7,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
-        android:layout_marginLeft="8dp"
-        android:layout_marginRight="8dp"
+        android:layout_marginLeft="@dimen/list_side_margin"
+        android:layout_marginRight="@dimen/list_side_margin"
         android:background="@color/material_white">
 
         <android.support.v4.widget.NestedScrollView
@@ -32,6 +32,7 @@
                     android:textAppearance="@style/TextAppearance.AppCompat.Body1"
                     android:textColorLink="@color/colorAccent"
                     android:textIsSelectable="true"
+                    android:textSize="@dimen/detail_body_text_size"
                     tools:text="Here goes a long long long long history" />
 
                 <TextView

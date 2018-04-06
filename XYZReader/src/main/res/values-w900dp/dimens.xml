@@ -1,0 +1,8 @@
+<resources>
+    <!-- list -->
+    <dimen name="list_side_margin">80dp</dimen>
+    <integer name="list_column_count">4</integer>
+
+    <!-- details -->
+    <dimen name="detail_meta_side_padding">88dp</dimen>
+</resources>

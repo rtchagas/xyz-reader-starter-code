@@ -1,6 +1,7 @@
 <android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/coordinator"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".ui.ArticleDetailActivity">
@@ -28,7 +29,7 @@
                 <ImageView
                     android:id="@+id/image_backdrop"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="@dimen/detail_backdrop_height"
                     android:scaleType="centerCrop"
                     tools:ignore="ContentDescription" />
 
@@ -44,21 +45,21 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="bottom"
                     android:orientation="vertical"
-                    android:paddingBottom="@dimen/detail_metabar_vert_padding"
-                    android:paddingLeft="@dimen/detail_inner_horiz_margin"
-                    android:paddingRight="@dimen/detail_inner_horiz_margin"
-                    android:paddingTop="@dimen/detail_metabar_vert_padding">
+                    android:paddingBottom="20dp"
+                    android:paddingEnd="@dimen/detail_meta_side_padding"
+                    android:paddingStart="@dimen/detail_meta_side_padding">
 
                     <TextView
                         android:id="@+id/article_title"
                         style="?android:attr/textAppearanceLarge"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:layout_marginBottom="4dp"
                         android:fontFamily="sans-serif-condensed"
                         android:lineSpacingMultiplier="0.9"
-                        android:paddingBottom="@dimen/detail_metabar_title_bottom_padding"
                         android:textColor="@color/material_white"
-                        android:textSize="@dimen/detail_title_text_size" />
+                        android:textSize="@dimen/detail_title_text_size"
+                        android:textStyle="bold" />
 
                     <TextView
                         android:id="@+id/article_byline"
@@ -91,7 +92,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
-        android:layout_margin="@dimen/fab_margin"
+        android:layout_margin="16dp"
         android:onClick="shareArticle"
         android:src="@drawable/ic_share_24dp"
         app:rippleColor="@color/colorAccentDark" />

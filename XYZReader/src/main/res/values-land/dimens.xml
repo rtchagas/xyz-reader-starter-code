@@ -1,0 +1,4 @@
+<resources>
+    <!-- list -->
+    <dimen name="backdrop_main_height">96dp</dimen>
+</resources>

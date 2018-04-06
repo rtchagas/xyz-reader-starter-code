@@ -1,6 +1,7 @@
 <android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/coordinator"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".ui.ArticleListActivity">
@@ -28,7 +29,7 @@
                 <ImageView
                     android:id="@+id/image_backdrop"
                     android:layout_width="match_parent"
-                    android:layout_height="@dimen/backdrop_height"
+                    android:layout_height="@dimen/backdrop_main_height"
                     android:contentDescription="@string/content_image_backdrop_main"
                     android:scaleType="centerCrop"
                     android:src="@drawable/image_backdrop_books" />
