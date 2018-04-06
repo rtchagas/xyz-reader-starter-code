@@ -104,8 +104,9 @@ public class ArticleDetailActivity extends AppCompatActivity
 
         if ((getIntent() != null) && (getIntent().getData() != null)) {
             mSelectedItemId = ItemsContract.Items.getItemId(getIntent().getData());
-            getLoaderManager().initLoader(0, null, ArticleDetailActivity.this);
         }
+
+        getLoaderManager().initLoader(0, null, ArticleDetailActivity.this);
     }
 
     @Override
@@ -269,7 +270,7 @@ public class ArticleDetailActivity extends AppCompatActivity
                 protected void onPostExecute(List<String> pages) {
                     super.onPostExecute(pages);
                     if (pages != null) {
-                        // Set the page adapter.
+                        // Set the adapter content.
                         mPagerAdapter.setPages(pages);
                     }
                 }
